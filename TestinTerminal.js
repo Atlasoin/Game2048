@@ -14,15 +14,24 @@ game1.show();
 rl.setPrompt("input the operation: 	");
 rl.prompt();
 
+let result = ""
+
 rl.on('line', function(line){
 	switch(line.trim()){
 		case 'w':
 			console.log("up");
+			result = game1.up();
+			if(result === "win" || result === "lost")
+				rl.close();
+			else if(result === "continue")
+				game1.show();
+			else
+				rl.close();
 			break;
 
 		case 'a':
 			console.log("left");
-			let result = game1.left();
+			result = game1.left();
 			if(result === "win" || result === "lost")
 				rl.close();
 			else if(result === "continue")
@@ -33,9 +42,23 @@ rl.on('line', function(line){
 		
 		case 's':
 			console.log("down");
+			result = game1.down();
+			if(result === "win" || result === "lost")
+				rl.close();
+			else if(result === "continue")
+				game1.show();
+			else
+				rl.close();
 			break;
 		case 'd':
 			console.log("right");
+			result = game1.right();
+			if(result === "win" || result === "lost")
+				rl.close();
+			else if(result === "continue")
+				game1.show();
+			else
+				rl.close();
 			break;
 		default:
 			console.log("invalid input")

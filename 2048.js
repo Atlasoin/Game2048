@@ -15,10 +15,10 @@ module.exports = class Game2048{
 		this.__update_layout();
 
 		//for test:
-		this.layout[0] = [0,0,0,0];
-		this.layout[1] = [0,0,2,0];
-		this.layout[2] = [0,0,0,4];
-		this.layout[3] = [0,0,0,0];
+		// this.layout[0] = [0,0,0,0];
+		// this.layout[1] = [0,0,2,0];
+		// this.layout[2] = [0,0,0,4];
+		// this.layout[3] = [0,0,0,0];
 	}
 
 	//show the current layout
@@ -34,7 +34,7 @@ module.exports = class Game2048{
 
 	__move_left(){
 		let movable = 0;
-		for(let i=0; i<this.size; i++){
+		for(let i = 0; i < this.size; i++){
 			let compressed = [];
 			let meetblank = 0;
 			for(let j = 0; j < this.size; j++){
@@ -59,15 +59,57 @@ module.exports = class Game2048{
 		}
 
 		if(movable === 0){
-			console.log("not movable")
 			return false;
 		}else{
 			return true;
 		}
 	}
 
-	left(){
-		if(this.__move_left()){
+	__move_right(){
+		for(let i = 0; i < this.size; i++){
+			this.layout[i].reverse();
+		}
+
+		let result = this.__move_left();
+
+		for(let i = 0; i < this.size; i++){
+			this.layout[i].reverse();
+		}
+
+		return result;
+	}
+
+	
+	__move_up(){
+		let transpose = a => a[0].map((_, c) => a.map(r => r[c]));
+		this.layout = transpose(this.layout);
+		let result = this.__move_left();
+		this.layout = transpose(this.layout);
+		return result;
+	}
+
+	__move_down(){
+		let transpose = a => a[0].map((_, c) => a.map(r => r[c]));
+		this.layout = transpose(this.layout);
+		let result = this.__move_right();
+		this.layout = transpose(this.layout);
+		return result;
+	}
+
+	__move(direction){
+
+		if(direction == "left")
+			return this.__move_left();
+		else if(direction == "right")
+			return this.__move_right();
+		else if(direction == "up")
+			return this.__move_up();
+		else if(direction == "down")
+			return this.__move_down();
+	}
+
+	move(direction){
+		if(this.__move(direction)){
 			if(this.__check_win()){
 				console.log("You win!");
 				return "win";
@@ -81,20 +123,25 @@ module.exports = class Game2048{
 				}
 			}
 		}
+		console.log("not movable");
 		return "continue";
+	}
 
+	left(){
+		return this.move("left");
+	}
+
+	right(){
+		return this.move("right");
 	}
 
 	down(){
+		return this.move("down");
 
 	}
 
 	up(){
-
-	}
-
-	right(){
-
+		return this.move("up");
 	}
 
 	//judgut if already win
@@ -127,6 +174,7 @@ module.exports = class Game2048{
 		let insert_n = Math.floor(Math.random()*empty_blocks.length);
 		var [insert_i,insert_j] = [empty_blocks[insert_n][0],empty_blocks[insert_n][1]];
 		this.layout[insert_i][insert_j] = this.__new_w();
+
 	}
 
 	__check_movable(){
