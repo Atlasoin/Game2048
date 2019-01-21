@@ -1,4 +1,4 @@
-class Game2048{
+module.exports = class Game2048{
 	constructor(size){
 		this.size = size;
 		this.layout = new Array(size);
@@ -35,38 +35,31 @@ class Game2048{
 	__move_left(){
 		let movable = 0;
 		for(let i=0; i<this.size; i++){
-			let last_w = 0;
-			for(let j=0; j<this.size; j++){
-				let before_moving_w = this.layout[i][j];
-				
-				let x = this.layout[i][j];
-				 while(x===0){
-				 	let varj = j;
-				 	for( ; varj + 1 < this.size; varj++){
-				 		x = this.layout[i][varj+1];					
-					 	this.layout[i][varj] = x;
-					 	this.layout[i][varj+1] = 0;
-					 	varj++;
-				 	}
-				 	if(varj + 1 == this.size)
-				 		break;
+			let compressed = [];
+			let meetblank = 0;
+			for(let j = 0; j < this.size; j++){
+				if(this.layout[i][j]){
+					compressed.push(this.layout[i][j]);
+					if(meetblank)
+						movable = 1;
 				}
-
-				let current_w = this.layout[i][j];
-				if(current_w != before_moving_w){
+				else
+					meetblank = 1;
+			}
+			
+			for(let k = 0; k + 1 < compressed.length; k++){
+				if(compressed[k] && compressed[k] == compressed[k+1]){
 					movable = 1;
-				}
-
-				if(current_w !== 0 && current_w === last_w){
-					this.layout[i][j-1] *= 2;
-					this.layout[i][j] = 0;
-					movable = 1;
-				}else{
-					last_w = current_w;
+					compressed[k] *= 2;
+					compressed = compressed.slice(0,k+1).concat(compressed.slice(k+2))
 				}
 			}
+			
+			this.layout[i] = compressed.concat(new Array(this.size-compressed.length).fill(0));
 		}
+
 		if(movable === 0){
+			console.log("not movable")
 			return false;
 		}else{
 			return true;
@@ -161,52 +154,3 @@ class Game2048{
 	}
 
 }
-
-game1 = new Game2048(4)
-
-//for test in terminal
-var readline = require("readline")
-var rl = readline.createInterface({
-	input: process.stdin,
-	output: process.stdout
-});
-
-game1.show();
-
-rl.setPrompt("input the operation: 	");
-rl.prompt();
-
-rl.on('line', function(line){
-	switch(line.trim()){
-		case 'w':
-			console.log("up");
-			break;
-
-		case 'a':
-			console.log("left");
-			let result = game1.left();
-			if(result === "win" || result === "lost")
-				rl.close();
-			else if(result === "continue")
-				game1.show();
-			else
-				rl.close();
-			break;
-		
-		case 's':
-			console.log("down");
-			break;
-		case 'd':
-			console.log("right");
-			break;
-		default:
-			console.log("invalid input")
-			break;
-	}
-	rl.prompt();
-});
-
-rl.on('close', function(){
-	process.exit(0);
-})
-
